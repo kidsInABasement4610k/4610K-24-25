@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       Student                                                   */
-/*    Created:      9/9/2024, 6:50:42 PM                                      */
+/*    Author:       smoot                                                     */
+/*    Created:      9/15/2024, 9:35:11 AM                                     */
 /*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
@@ -13,6 +13,36 @@ using namespace vex;
 
 // A global instance of competition
 competition Competition;
+brain  Brain;
+controller Controller1 = controller(primary);
+motor leftFront = motor(PORT1, ratio18_1, true);
+motor rightFront = motor(PORT10, ratio18_1, false);
+motor leftMiddle = motor(PORT11, ratio18_1, true);
+motor rightMiddle = motor(PORT18, ratio18_1, false);
+motor leftBack = motor(PORT15, ratio18_1, true);
+motor rightBack = motor(PORT20, ratio18_1, false);
+extern brain Brain;
+extern controller Controller1;
+extern motor leftFront;
+extern motor rightFront;
+extern motor leftBack;
+extern motor rightBack;
+extern motor rightMiddle;
+extern motor leftMiddle;
+
+void drive(){
+  while(true) {
+    //drive
+    leftFront.spin(forward, Controller1.Axis3.position() + (Controller1.Axis1.position()/2), pct);
+    leftBack.spin(forward, Controller1.Axis3.position() + (Controller1.Axis1.position()/2), pct);
+    rightFront.spin(forward, Controller1.Axis3.position() - (Controller1.Axis1.position()/2), pct);
+    rightBack.spin(forward, Controller1.Axis3.position() - (Controller1.Axis1.position()/2), pct);   
+    leftMiddle.spin(forward, Controller1.Axis3.position() + (Controller1.Axis1.position()/2), pct);
+    rightMiddle.spin(forward, Controller1.Axis3.position() - (Controller1.Axis1.position()/2), pct);
+  }
+}
+    
+
 
 // define your global instances of motors and other devices here
 
@@ -61,6 +91,7 @@ void autonomous(void) {
 void usercontrol(void) {
   // User control code here, inside the loop
   while (1) {
+    drive();
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo
     // values based on feedback from the joysticks.
