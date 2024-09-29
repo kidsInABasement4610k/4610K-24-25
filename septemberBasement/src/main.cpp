@@ -11,25 +11,24 @@
 
 using namespace vex;
 
-// A global instance of competition
 competition Competition;
 
 brain  Brain;
 controller Controller1 = controller(primary);
-//for 4610K robot
 
-//motor leftFront = motor(PORT1, ratio18_1, true);
-//motor rightFront = motor(PORT10, ratio18_1, false);
-motor leftMiddle = motor(PORT11, ratio18_1, true);
+//for 4610K robot
+motor leftFront = motor(PORT11, ratio18_1, true);
+motor rightFront = motor(PORT5, ratio18_1, false);
+motor leftMiddle = motor(PORT19, ratio18_1, true);
 motor rightMiddle = motor(PORT18, ratio18_1, false);
 motor leftBack = motor(PORT15, ratio18_1, true);
-motor rightBack = motor(PORT20, ratio18_1, false);
-//inertial aniNertial = inertial(PORT7);
+motor rightBack = motor(PORT12, ratio18_1, false);
+digital_out pnu1 = digital_out(Brain.ThreeWirePort.A);
+digital_out pnu2 = digital_out(Brain.ThreeWirePort.B);
+motor intake = motor(PORT17, ratio18_1, true);
 
 
-inertial aniNertial = inertial(PORT17);
-motor leftFront = motor(PORT1, ratio18_1, false);
-motor rightFront = motor(PORT3, ratio18_1, true);
+inertial aniNertial = inertial(PORT20);
 
 extern brain Brain;
 extern controller Controller1;
@@ -39,12 +38,17 @@ extern motor leftBack;
 extern motor rightBack;
 extern motor rightMiddle;
 extern motor leftMiddle;
+extern digital_out pnu1;
+extern digital_out pnu2;
+extern inertial aniNertial;
+extern motor intake;
 
+//aniGle is the global angle! (named after anika obv)
 int aniGle = 0;
 
 void pre_auton(void) {
   aniNertial.calibrate();
-  
+
 }
 
 void turn(int angle) { 
@@ -91,15 +95,16 @@ void turn(int angle) {
   leftMiddle.stop();
 }
 
-//tune kp for robot (same for r)
+//tune kp for robot (same for right turns!)
+//change minSpeed
 void turnL(int target){
   aniGle = target;
   double error;
 
   while(aniNertial.rotation(degrees) > aniGle){
-    error = target + aniNertial.rotation(degrees);
-    double kp = 1;
-    double minSpeed = 10;
+    error = abs(target - aniNertial.rotation(degrees));
+    double kp = 0.5;
+    double minSpeed = 5;
     double speed = error * kp + minSpeed;
 
     leftFront.spin(reverse, speed, pct);
@@ -117,6 +122,7 @@ void turnL(int target){
   rightBack.setStopping(brake);
   leftMiddle.setStopping(brake);
   rightMiddle.setStopping(brake);
+
   leftFront.stop();
   leftMiddle.stop();
   rightMiddle.stop();
@@ -131,8 +137,8 @@ void turnR(int target){
 
   while(aniNertial.rotation(degrees) < aniGle){
     error = target - aniNertial.rotation(degrees);
-    double kp = 1;
-    double minSpeed = 10;
+    double kp = 0.5;
+    double minSpeed = 5;
     double speed = error * kp + minSpeed;
     
     leftFront.spin(fwd, speed, pct);
@@ -150,6 +156,7 @@ void turnR(int target){
   rightMiddle.setStopping(brake);
   leftMiddle.setStopping(brake);
   rightFront.setStopping(brake);
+
   leftFront.stop();
   leftBack.stop();
   rightFront.stop();
@@ -158,12 +165,13 @@ void turnR(int target){
   rightBack.stop();
 }
 
-void go(double target, int min, int max) { 
+//minimum and maximum paramaters for different scenarios
+void moveF(double target, int min, int max) { 
   leftFront.resetPosition();
 
   while(leftFront.position(degrees) < target) {
     double error = target - leftFront.position(degrees); 
-    double kp = .6;
+    double kp = .4;
     double speed = error * kp + min; 
     if(speed > max){
       speed = max;
@@ -183,7 +191,7 @@ void go(double target, int min, int max) {
   rightFront.setStopping(coast);
 }
 
-void goB(double target, int min, int max){
+void moveR(double target, int min, int max){
   leftFront.resetPosition();
 
   while(leftFront.position(degrees) > -target) {
@@ -193,8 +201,8 @@ void goB(double target, int min, int max){
     if(speed > max){
       speed = max;
     }
-    leftFront.spin(fwd, speed, pct);
-    rightFront.spin(fwd, speed, pct);
+    leftFront.spin(fwd, -speed, pct);
+    rightFront.spin(fwd, -speed, pct);
   }
 
   leftFront.setStopping(brake);
@@ -207,6 +215,11 @@ void goB(double target, int min, int max){
   leftFront.setStopping(coast);
   rightFront.setStopping(coast);
 }
+
+/*At least three (3) Scored Rings of the Alliance's color
+A minimum of two (2) Stakes on the Alliance's side of the Autonomous Line with at least (1) Ring of the Alliance's color Scored
+Neither Robot contacting / breaking the plane of the Starting Line
+At least One (1) Robot contacting the Ladder */
 
 void autonomous(void) {
 }
@@ -223,21 +236,30 @@ void drive(){
   }
 }
 
-void usercontrol(void) {
-  while (1) {
+void codingChallenge(){
     //24 fwd, right 45, 12 rev, left 90
-    aniNertial.calibrate();
-    wait(3, sec);
-    
-    go(5000, 10, 40);
-    turnR(45);
-    goB(2500, 10, 40);
+    moveF(1050, 10, 40);
     turnL(-45);
-
-    wait(20, msec); 
-  }
+    moveR(700, 10, 40);
+    turnR(45);
 }
 
+void twofivezeroninea(){
+    moveF(1500, 10, 40);
+    turnR(45);
+    moveF(525, 10, 40);
+    turnR(90);
+    moveR(1500, 10, 40);
+    turnR(180);
+}
+
+void usercontrol(void) {
+  while (1) {
+    aniNertial.calibrate();
+    wait(3, sec);
+     
+  }
+}
 
 int main() {
   Competition.autonomous(autonomous);
