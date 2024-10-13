@@ -20,15 +20,14 @@ controller Controller1 = controller(primary);
 motor leftFront = motor(PORT7, ratio18_1, false);
 motor rightFront = motor(PORT12, ratio18_1, true);
 motor leftMiddle = motor(PORT19, ratio18_1, false);
-motor rightMiddle = motor(PORT18, ratio18_1, true);
+motor rightMiddle = motor(PORT11, ratio18_1, true);
 motor leftBack = motor(PORT15, ratio18_1, false);
 motor rightBack = motor(PORT8, ratio18_1, true);
 digital_out mm1 = digital_out(Brain.ThreeWirePort.A);
 digital_out mm2 = digital_out(Brain.ThreeWirePort.B);
 motor intake = motor(PORT17, ratio18_1, true);
 
-
-inertial aniNertial = inertial(PORT16);
+inertial aniNertial = inertial(PORT18);
 
 extern brain Brain;
 extern controller Controller1;
@@ -38,8 +37,8 @@ extern motor leftBack;
 extern motor rightBack;
 extern motor rightMiddle;
 extern motor leftMiddle;
-extern digital_out pnu1;
-extern digital_out pnu2;
+extern digital_out mm1;
+extern digital_out mm2;
 extern inertial aniNertial;
 extern motor intake;
 
@@ -49,6 +48,12 @@ int aniGle = 0;
 void pre_auton(void) {
   aniNertial.calibrate();
   aniNertial.resetRotation();
+}
+
+void getDonuts(double time){
+  intake.spin(fwd, 50, pct);
+  wait(time, msec);
+  intake.stop();
 }
 
 //tune kp for robot (same for right turns!)
@@ -190,7 +195,6 @@ void moveR(double target, int min){
   leftFront.stop();
   rightFront.stop();
 
-
   leftFront.setStopping(coast);
   rightFront.setStopping(coast);
   wait(200, msec);
@@ -200,6 +204,10 @@ void moveR(double target, int min){
 A minimum of two (2) Stakes on the Alliance's side of the Autonomous Line with at least (1) Ring of the Alliance's color Scored
 Neither Robot contacting / breaking the plane of the Starting Line
 At least One (1) Robot contacting the Ladder */
+
+void awp(){
+  moveF(1050, 10);
+}
 
 void codingChallenge(){
   //24 fwd, right 45, 12 rev, left 90
