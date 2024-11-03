@@ -17,6 +17,7 @@ brain  Brain;
 controller Controller1 = controller(primary);
 
 //for 4610K robot
+/*
 
 motor rightBack = motor(PORT15, ratio18_1, false);
 motor leftBack = motor(PORT11, ratio18_1, true);
@@ -39,19 +40,19 @@ extern motor leftMiddle;
 extern digital_out clamp;
 extern inertial aniNertial;
 extern motor intake;
-
+*/
 
 //ghost bot ports
-/*
-motor leftFront = motor(PORT5, ratio18_1, false);
-motor rightFront = motor(PORT11, ratio18_1, true);
+
+motor leftFront = motor(PORT1, ratio18_1, false);
+motor rightFront = motor(PORT2, ratio18_1, true);
 motor leftMiddle = motor(PORT17, ratio18_1, false);
 motor rightMiddle = motor(PORT14, ratio18_1, true);
 motor leftBack = motor(PORT16, ratio18_1, false);
-motor rightBack = motor(PORT1, ratio18_1, true);
+motor rightBack = motor(PORT7, ratio18_1, true);
 digital_out clamp = digital_out(Brain.ThreeWirePort.H);
 motor intake = motor(PORT19, ratio18_1, true);
-inertial aniNertial = inertial(PORT18);
+inertial aniNertial = inertial(PORT20);
 
 extern brain Brain;
 extern controller Controller1;
@@ -64,7 +65,7 @@ extern motor leftMiddle;
 extern digital_out clamp;
 extern inertial aniNertial;
 extern motor intake;
-*/
+
 
 //aniGle is the global angle! (named after anika obv)
 int aniGle = 0;
@@ -120,7 +121,6 @@ void turnL(int target){
   rightBack.stop();
   wait(200, msec);
 }
-
 void turnR(int target){
   aniGle = target;
   double error;
@@ -274,7 +274,6 @@ void v1Leftrb(){ //half awp
   turnL(50);
   //moveF 1 square
   moveF(1100, 10);
-
 }
 
 //redo this! this is bad!
