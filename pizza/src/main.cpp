@@ -17,17 +17,17 @@ brain  Brain;
 controller Controller1 = controller(primary);
 
 //for 4610K robot
-/*
 
-motor rightBack = motor(PORT15, ratio18_1, false);
-motor leftBack = motor(PORT11, ratio18_1, true);
-motor rightMiddle = motor(PORT17, ratio18_1, false);
-motor leftMiddle = motor(PORT14, ratio18_1, true);
-motor rightFront = motor(PORT16, ratio18_1, false);
-motor leftFront = motor(PORT5, ratio18_1, true);
+
+motor rightBack = motor(PORT18, ratio18_1, false);
+motor leftBack = motor(PORT14, ratio18_1, true);
+motor rightMiddle = motor(PORT5, ratio18_1, false);
+motor leftMiddle = motor(PORT11, ratio18_1, true);
+motor rightFront = motor(PORT2, ratio18_1, false);
+motor leftFront = motor(PORT15, ratio18_1, true);
 digital_out clamp = digital_out(Brain.ThreeWirePort.H);
-motor intake = motor(PORT19, ratio18_1, true);
-inertial aniNertial = inertial(PORT20);
+motor intake = motor(PORT8, ratio18_1, true);
+inertial aniNertial = inertial(PORT21);
 
 extern brain Brain;
 extern controller Controller1;
@@ -40,10 +40,10 @@ extern motor leftMiddle;
 extern digital_out clamp;
 extern inertial aniNertial;
 extern motor intake;
-*/
+
 
 //ghost bot ports
-
+/*
 motor leftFront = motor(PORT1, ratio18_1, false);
 motor rightFront = motor(PORT2, ratio18_1, true);
 motor leftMiddle = motor(PORT17, ratio18_1, false);
@@ -65,7 +65,7 @@ extern motor leftMiddle;
 extern digital_out clamp;
 extern inertial aniNertial;
 extern motor intake;
-
+*/
 
 //aniGle is the global angle! (named after anika obv)
 int aniGle = 0;
@@ -73,12 +73,6 @@ int aniGle = 0;
 void pre_auton(void) {
   aniNertial.calibrate();
   aniNertial.resetRotation();
-}
-
-void donuts(double time){
-  intake.spin(fwd, 100, pct);
-  wait(time, msec);
-  intake.stop();
 }
 
 //tune kp for robot (same for right turns!)
@@ -159,70 +153,108 @@ void turnR(int target){
   rightBack.stop();
   wait(200,msec);
 }
+void moveDonuts(int ms, int speed) { 
+  leftFront.spin(reverse, speed, pct);
+  rightFront.spin(reverse, speed, pct);  
+  leftMiddle.spin(reverse, speed, pct);
+  rightMiddle.spin(reverse, speed, pct);
+  leftBack.spin(reverse, speed, pct);
+  rightBack.spin(reverse, speed, pct);
+  intake.spin(reverse, 100, pct);
 
+  wait(ms, msec);
+
+  leftFront.stop();
+  rightFront.stop();
+  leftBack.stop();
+  rightBack.stop();
+  leftMiddle.stop();
+  rightMiddle.stop();
+  intake.stop();
+
+}
 //minimum and maximum paramaters for different scenarios
-void moveF(double target, int min) { 
+void moveF(double target, int min, bool donut) { 
   leftFront.resetPosition();
   rightFront.resetPosition();
   double deriviative;
   double error = target - (leftFront.position(degrees)+rightFront.position(degrees))/2; 
-  double kd = .2;
+  double kd = .09;
 
   while((leftFront.position(degrees)+rightFront.position(degrees))/2 < target) {
     double prevErr = error;
     error = target - (leftFront.position(degrees)+rightFront.position(degrees))/2; 
-    double kp = .3;
+    double kp = .04;
     deriviative = error - prevErr;
     double speed = error * kp + deriviative * kd + min; 
-    int max = 100;
+    int max = 80;
     if(speed > max){
       speed = max;
     }
     leftFront.spin(fwd, speed, pct);
     rightFront.spin(fwd, speed, pct);
+    leftBack.spin(fwd, speed, pct);
+    rightBack.spin(fwd, speed, pct);
+    leftMiddle.spin(fwd, speed, pct);
+    rightMiddle.spin(fwd, speed, pct);
+    if(donut){
+      intake.spin(reverse, 100, pct);
+    }
     wait(10, msec);
   }
 
-  leftFront.setStopping(brake);
-  rightFront.setStopping(brake);
+  intake.stop();
   leftFront.stop();
   rightFront.stop();
+  leftBack.stop();
+  rightBack.stop();
+  leftMiddle.stop();
+  rightMiddle.stop();
 
-  leftFront.setStopping(coast);
-  rightFront.setStopping(coast);
   wait(200, msec);
 }
 
-void moveR(double target, int min){
+void moveR(double target, int min, int max){
   leftFront.resetPosition();
   rightFront.resetPosition();
   double deriviative;
   double error = target - (leftFront.position(degrees)+rightFront.position(degrees))/2;
-  double kd = .2;
+  double kd = .09;
 
   while((leftFront.position(degrees)+rightFront.position(degrees))/2 > -target) {
     double prevErr = error;
     error = target - (leftFront.position(degrees)+rightFront.position(degrees))/2; 
-    double kp = .3;
+    double kp = .04;
     deriviative = error - prevErr;
     double speed = error * kp + deriviative * kd + min; 
-    int max = 100;
     if(speed > max){
       speed = max;
     }
+    intake.spin(reverse, 100, pct);
     leftFront.spin(fwd, -speed, pct);
     rightFront.spin(fwd, -speed, pct);
+    leftBack.spin(fwd, -speed, pct);
+    rightBack.spin(fwd, -speed, pct);
+    leftMiddle.spin(fwd, -speed, pct);
+    rightMiddle.spin(fwd, -speed, pct);
     wait(10,msec);
   }
 
-  leftFront.setStopping(brake);
-  rightFront.setStopping(brake);
   leftFront.stop();
   rightFront.stop();
+  leftBack.stop();
+  rightBack.stop();
+  leftMiddle.stop();
+  rightMiddle.stop();
+  intake.stop();
 
-  leftFront.setStopping(coast);
-  rightFront.setStopping(coast);
   wait(200, msec);
+}
+
+void donut(int ms){
+  intake.spin(reverse, 100, pct);
+  wait(ms,msec);
+  intake.stop();
 }
 
 /*At least three (3) Scored Rings of the Alliance's color
@@ -231,29 +263,73 @@ Neither Robot contacting / breaking the plane of the Starting Line
 At least One (1) Robot contacting the Ladder */
 //do not pass the Autonomous Line
 
+
+//FOR CLAMP: TRUE IS UP, FALSE IS DOWN  
 //dont do this! it is good!
-void v1Rightrb(){ //half awp
-  //starting parallel to the mogo on the right side, move forward and grab the mogo
+/*
+void v1Rightrb(){ //starting parallel to the mogo on the right side, move forward and grab the mogo
   //knock over piles and get the blue rings
   //touch the ladder
   //if the other team gets at least one donut on mogo
   //start with preload
   //moveF 2 squares
-  moveF(1800, 10);
-  //clamp set true
   clamp.set(true);
+  moveF(500, 10);
+  //clamp set true
+  wait(400, msec);
+  clamp.set(false);
+  wait(400, msec);
   //left -90 degrees
   turnL(-90);
   //moveR 1 square
-  moveR(950, 10);
   //intake start
-  donuts(1000);
-  //right -45 degrees
-  turnR(-50);
-  //move F 1 square
-  moveF(1100, 10);
+  moveR(300, 10, 80);
+  donut(900);
+  turnR(-40);
+  moveR(800, 5, 30);
+
+}*/
+
+void blueRightAutonomous(){
+  moveF(500, 10, false);
+  //clamp set true
+  wait(400, msec);
+  clamp.set(true);
+  wait(400, msec);
+  //left -90 degrees
+  turnL(-90);
+  //moveR 1 square
+  //intake start
+  moveR(300, 10, 80);
+  donut(1300);
+  turnL(-180);
+  moveR(125, 10, 100);
+  donut(2700);
 }
 
+void blueLeftAutonomous(){
+  moveF(500, 10, false);
+  //clamp set true
+  wait(200, msec);
+  clamp.set(true);
+  wait(200, msec);
+  //left -90 degrees
+  turnR(90);
+  //moveR 1 square
+  //intake start
+  moveR(350, 10, 80);
+  donut(2000);
+  turnL(75);
+  moveF(550, 5, false);
+  /*
+  turnL(45);
+  moveR(575, 15, 100);
+  turnL(-15);
+  turnR(20);
+  donut(2700);
+  */
+}
+/*
 void v1Leftrb(){ //half awp
   //starting parallel to the mogo on the right side, move forward and grab the mogo
   //knock over piles and get the blue rings
@@ -261,36 +337,32 @@ void v1Leftrb(){ //half awp
   //if the other team gets at least one donut on mogo
   //start with preload
   //move 2 squares
-  moveF(1800, 10);
+  moveF(900, 10);
   //right 90
   turnR(90);
   //clamp set true
   clamp.set(true);
   //reverse 1 square
-  moveR(950, 10);
+  moveR(950, 10, 80);
   //intake start
-  donuts(1000);
   //turn left 45
   turnL(50);
   //moveF 1 square
-  moveF(1100, 10);
+  moveF(550, 10);
 }
 
 //redo this! this is bad!
 void v2LeftB(){
   moveF(2000, 10);
   clamp.set(true);
-  donuts(500);
   clamp.set(false);
   turnR(90);
   moveF(2000, 10);
   clamp.set(true);
   turnR(-90);
   moveF(400, 10);
-  donuts(500);
   turnL(180);
   moveF(350, 10);
-  donuts(500);
   turnL(-90);
   moveF(500, 10);
 }
@@ -299,17 +371,14 @@ void v2LeftB(){
 void v2RightR(){
   moveF(2000, 10);
   clamp.set(true);
-  donuts(500);
   clamp.set(false);
   turnL(-90);
   moveF(2000, 10);
   clamp.set(true);
   turnL(90);
   moveF(400, 10);
-  donuts(500);
   turnR(180);
   moveF(350, 10);
-  donuts(500);
   turnR(90);
   moveF(500, 10);
 }
@@ -318,10 +387,10 @@ void codingChallenge(){
   //24 fwd, right 45, 12 rev, left 90
   moveF(1050, 10);
   turnL(-45);
-  moveR(700, 10);
+  moveR(700, 10, 80);
   turnR(45);
-}
-
+}*/
+/*
 void twofivezeroninea(){
   //from the finals at highlander summit
   //blue right
@@ -329,7 +398,7 @@ void twofivezeroninea(){
   turnR(45);
   moveF(525, 10);
   turnR(90);
-  moveR(1500, 10);
+  moveR(1500, 10, 80);
   turnR(180);
 }
 
@@ -419,9 +488,9 @@ void onesixtyninetyninec(){
   //left 15
   turnL(15);
 }
-
+*/
 void autonomous(void) {
-  v1Rightrb();
+  blueLeftAutonomous();
 }
 
 void drive(){
