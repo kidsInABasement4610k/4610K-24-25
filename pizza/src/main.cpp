@@ -495,17 +495,19 @@ void autonomous(void) {
 
 void drive(){
   while(true) {
-    //drive
-    leftFront.spin(fwd, Controller1.Axis3.position() + (Controller1.Axis1.position()/3), pct);
-    leftBack.spin(fwd, Controller1.Axis3.position() + (Controller1.Axis1.position()/3), pct);
-    rightFront.spin(fwd, Controller1.Axis3.position() - (Controller1.Axis1.position()/3), pct);
-    rightBack.spin(fwd, Controller1.Axis3.position() - (Controller1.Axis1.position()/3), pct);   
-    leftMiddle.spin(fwd, Controller1.Axis3.position() + (Controller1.Axis1.position()/3), pct);
-    rightMiddle.spin(fwd, Controller1.Axis3.position() - (Controller1.Axis1.position()/3), pct);
+    //test this, i reversed the movement for driver controlled only ._.
+    leftFront.spin(fwd, -(Controller1.Axis3.position() + (Controller1.Axis1.position()/3)), pct);
+    leftBack.spin(fwd, -(Controller1.Axis3.position() + (Controller1.Axis1.position()/3)), pct);
+    rightFront.spin(fwd, -(Controller1.Axis3.position() - (Controller1.Axis1.position()/3)), pct);
+    rightBack.spin(fwd, -(Controller1.Axis3.position() - (Controller1.Axis1.position()/3)), pct);   
+    leftMiddle.spin(fwd, -(Controller1.Axis3.position() + (Controller1.Axis1.position()/3)), pct);
+    rightMiddle.spin(fwd, -(Controller1.Axis3.position() - (Controller1.Axis1.position()/3)), pct);
   
     if(Controller1.ButtonL1.pressing()){
       intake.spin(reverse, 100, pct);
-    } else{
+    } else if(Controller1.ButtonL2.pressing()){
+      intake.spin(forward, 100, pct);
+    } else {
       intake.stop();
     }
   
