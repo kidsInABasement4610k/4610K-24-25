@@ -307,6 +307,41 @@ void blueRightAutonomous(){
   donut(2700);
 }
 
+//test this!
+void redRightAutonomous(){
+  moveF(500, 10, false);
+  //clamp set true
+  wait(200, msec);
+  clamp.set(true);
+  wait(200, msec);
+  //left -90 degrees
+  turnL(-90);
+  //moveR 1 square
+  //intake start
+  moveR(350, 10, 80);
+  donut(2000);
+  turnR(-75);
+  moveF(550, 5, false);
+}
+
+//test this!
+void redLeftAutonomous(){
+  moveF(500, 10, false);
+  //clamp set true
+  wait(400, msec);
+  clamp.set(true);
+  wait(400, msec);
+  //left -90 degrees
+  turnR(90);
+  //moveR 1 square
+  //intake start
+  moveR(300, 10, 80);
+  donut(1300);
+  turnR(180);
+  moveR(125, 10, 100);
+  donut(2700);
+}
+
 void blueLeftAutonomous(){
   moveF(500, 10, false);
   //clamp set true
@@ -496,12 +531,12 @@ void autonomous(void) {
 void drive(){
   while(true) {
     //test this, i reversed the movement for driver controlled only ._.
-    leftFront.spin(fwd, -(Controller1.Axis3.position() + (Controller1.Axis1.position()/3)), pct);
-    leftBack.spin(fwd, -(Controller1.Axis3.position() + (Controller1.Axis1.position()/3)), pct);
-    rightFront.spin(fwd, -(Controller1.Axis3.position() - (Controller1.Axis1.position()/3)), pct);
-    rightBack.spin(fwd, -(Controller1.Axis3.position() - (Controller1.Axis1.position()/3)), pct);   
-    leftMiddle.spin(fwd, -(Controller1.Axis3.position() + (Controller1.Axis1.position()/3)), pct);
-    rightMiddle.spin(fwd, -(Controller1.Axis3.position() - (Controller1.Axis1.position()/3)), pct);
+    leftFront.spin(fwd, -(Controller1.Axis3.position() - (Controller1.Axis1.position()/5)), pct);
+    leftBack.spin(fwd, -(Controller1.Axis3.position() - (Controller1.Axis1.position()/5)), pct);
+    rightFront.spin(fwd, -(Controller1.Axis3.position() + (Controller1.Axis1.position()/5)), pct);
+    rightBack.spin(fwd, -(Controller1.Axis3.position() + (Controller1.Axis1.position()/5)), pct);   
+    leftMiddle.spin(fwd, -(Controller1.Axis3.position() - (Controller1.Axis1.position()/5)), pct);
+    rightMiddle.spin(fwd, -(Controller1.Axis3.position() + (Controller1.Axis1.position()/5)), pct);
   
     if(Controller1.ButtonL1.pressing()){
       intake.spin(reverse, 100, pct);
