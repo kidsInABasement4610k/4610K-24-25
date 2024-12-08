@@ -17,8 +17,6 @@ brain  Brain;
 controller Controller1 = controller(primary);
 
 //for 4610K robot
-
-
 motor rightBack = motor(PORT18, ratio18_1, false);
 motor leftBack = motor(PORT14, ratio18_1, true);
 motor rightMiddle = motor(PORT5, ratio18_1, false);
@@ -29,30 +27,9 @@ digital_out clamp = digital_out(Brain.ThreeWirePort.H);
 motor intake = motor(PORT8, ratio18_1, true);
 inertial aniNertial = inertial(PORT21);
 
-extern brain Brain;
-extern controller Controller1;
-extern motor leftFront;
-extern motor rightFront;
-extern motor leftBack;
-extern motor rightBack;
-extern motor rightMiddle;
-extern motor leftMiddle;
-extern digital_out clamp;
-extern inertial aniNertial;
-extern motor intake;
+bumper beep = bumper(Brain.ThreeWirePort.A); //find the correct port for this
 
-
-//ghost bot ports
-/*
-motor leftFront = motor(PORT1, ratio18_1, false);
-motor rightFront = motor(PORT2, ratio18_1, true);
-motor leftMiddle = motor(PORT17, ratio18_1, false);
-motor rightMiddle = motor(PORT14, ratio18_1, true);
-motor leftBack = motor(PORT16, ratio18_1, false);
-motor rightBack = motor(PORT7, ratio18_1, true);
-digital_out clamp = digital_out(Brain.ThreeWirePort.H);
-motor intake = motor(PORT19, ratio18_1, true);
-inertial aniNertial = inertial(PORT20);
+extern bumper beep;
 
 extern brain Brain;
 extern controller Controller1;
@@ -65,15 +42,10 @@ extern motor leftMiddle;
 extern digital_out clamp;
 extern inertial aniNertial;
 extern motor intake;
-*/
 
 //aniGle is the global angle! (named after anika obv)
 int aniGle = 0;
-
-void pre_auton(void) {
-  aniNertial.calibrate();
-  aniNertial.resetRotation();
-}
+int beepy = 0;
 
 //tune kp for robot (same for right turns!)
 //change minSpeed
@@ -214,7 +186,7 @@ void moveF(double target, int min, bool donut) {
   wait(200, msec);
 }
 
-void moveR(double target, int min, int max){
+void moveR(double target, int min, int max, bool donut){
   leftFront.resetPosition();
   rightFront.resetPosition();
   double deriviative;
@@ -230,7 +202,9 @@ void moveR(double target, int min, int max){
     if(speed > max){
       speed = max;
     }
-    intake.spin(reverse, 100, pct);
+    if(donut){
+      intake.spin(reverse, 100, pct);
+    }
     leftFront.spin(fwd, -speed, pct);
     rightFront.spin(fwd, -speed, pct);
     leftBack.spin(fwd, -speed, pct);
@@ -293,18 +267,21 @@ void v1Rightrb(){ //starting parallel to the mogo on the right side, move forwar
 void blueRightAutonomous(){
   moveF(500, 10, false);
   //clamp set true
-  wait(400, msec);
+  wait(200, msec);
   clamp.set(true);
-  wait(400, msec);
+  wait(200, msec);
   //left -90 degrees
   turnL(-90);
   //moveR 1 square
   //intake start
-  moveR(300, 10, 80);
+  moveR(400, 10, 80, true);
   donut(1300);
   turnL(-180);
-  moveR(125, 10, 100);
-  donut(2700);
+  moveR(140, 10, 100, true);
+  donut(2500);
+  moveF(200, 5, true);
+  turnR(-75);
+  moveF(1000, 10, false);
 }
 
 //test this!
@@ -318,28 +295,30 @@ void redRightAutonomous(){
   turnL(-90);
   //moveR 1 square
   //intake start
-  moveR(350, 10, 80);
+  moveR(350, 10, 80, false);
   donut(2000);
   turnR(-75);
   moveF(550, 5, false);
 }
 
-//test this!
 void redLeftAutonomous(){
   moveF(500, 10, false);
   //clamp set true
-  wait(400, msec);
+  wait(200, msec);
   clamp.set(true);
-  wait(400, msec);
+  wait(200, msec);
   //left -90 degrees
   turnR(90);
   //moveR 1 square
   //intake start
-  moveR(300, 10, 80);
+  moveR(400, 10, 80, true);
   donut(1300);
   turnR(180);
-  moveR(125, 10, 100);
-  donut(2700);
+  moveR(140, 10, 100, true);
+  donut(2500);
+  moveF(200, 5, true);
+  turnL(75);
+  moveF(1000, 10, false);
 }
 
 void blueLeftAutonomous(){
@@ -352,7 +331,7 @@ void blueLeftAutonomous(){
   turnR(90);
   //moveR 1 square
   //intake start
-  moveR(350, 10, 80);
+  moveR(350, 10, 80, false);
   donut(2000);
   turnL(75);
   moveF(550, 5, false);
@@ -363,6 +342,10 @@ void blueLeftAutonomous(){
   turnR(20);
   donut(2700);
   */
+}
+
+void autoSkills(){
+
 }
 /*
 void v1Leftrb(){ //half awp
@@ -524,8 +507,55 @@ void onesixtyninetyninec(){
   turnL(15);
 }
 */
+//slot 1 - redleft
+//slot 2 - redright
+//slot 3 - blueleft
+//slot 4 - blueright
+
+void pre_auton(void) {
+  aniNertial.calibrate();
+  aniNertial.resetRotation();
+  while(true){
+    if(beep.pressing()){
+      beepy++;
+      Brain.Screen.clearScreen();
+      Brain.Screen.setCursor(1, 1);
+      if(beepy == 1){
+        Brain.Screen.print("red left auton");
+      } else if(beepy == 2){
+        Brain.Screen.print("red right auton");
+      } else if(beepy == 3){
+        Brain.Screen.print("blue left auton");
+      } else if(beepy == 4){
+        Brain.Screen.print("blue right auton");
+      } else if(beepy == 5){
+        Brain.Screen.print("auto skills?");
+      } else {
+        beepy = 0;
+        Brain.Screen.print("no auton - click again to go back to red left");
+      }
+    }
+    wait(20, msec);
+  }
+}
 void autonomous(void) {
-  blueLeftAutonomous();
+  switch(beepy){
+    case 1:
+      redLeftAutonomous();
+      break;
+    case 2:
+      redRightAutonomous();
+      break;
+    case 3:
+      blueLeftAutonomous();
+      break;
+    case 4:
+      blueRightAutonomous();
+      break;
+    case 5:
+      autoSkills();
+      break;
+  }
 }
 
 void drive(){
@@ -572,7 +602,7 @@ void usercontrol(void) {
 int main() {
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
-
+  
   pre_auton();
 
   while (true) {
