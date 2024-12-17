@@ -597,8 +597,17 @@ void onesixtyninetyninec(){
 //slot 4 - blueright
 
 void pre_auton(void) {
+  Brain.Screen.clearScreen();
+  Brain.Screen.setCursor(1, 1);
+  Brain.Screen.print("calibrating inertial...");
   aniNertial.calibrate();
+  Brain.Screen.clearScreen();
+  Brain.Screen.setCursor(1, 1);
+  Brain.Screen.print("resetting rotation...");
   aniNertial.resetRotation();
+  Brain.Screen.clearScreen();
+  Brain.Screen.setCursor(1, 1);
+  Brain.Screen.print("hold the bumper to select auton!");
   while(true){
     if(beep.pressing()){
       beepy++;
@@ -613,10 +622,10 @@ void pre_auton(void) {
       } else if(beepy == 4){
         Brain.Screen.print("blue right auton");
       } else if(beepy == 5){
-        Brain.Screen.print("auto skills?");
+        Brain.Screen.print("auto skills");
       } else {
         beepy = 0;
-        Brain.Screen.print("no auton - click again to go back to red left");
+        Brain.Screen.print("no auton - keep holding the bumper to go back to red left!");
       }
     }
     wait(500, msec);
@@ -647,13 +656,16 @@ void autonomous(void) {
 
 void drive(){
   while(true) {
-    //test this, i reversed the movement for driver controlled only ._.
-    leftFront.spin(fwd, -(Controller1.Axis3.position() - (Controller1.Axis1.position()/5)), pct);
-    leftBack.spin(fwd, -(Controller1.Axis3.position() - (Controller1.Axis1.position()/5)), pct);
-    rightFront.spin(fwd, -(Controller1.Axis3.position() + (Controller1.Axis1.position()/5)), pct);
-    rightBack.spin(fwd, -(Controller1.Axis3.position() + (Controller1.Axis1.position()/5)), pct);   
-    leftMiddle.spin(fwd, -(Controller1.Axis3.position() - (Controller1.Axis1.position()/5)), pct);
-    rightMiddle.spin(fwd, -(Controller1.Axis3.position() + (Controller1.Axis1.position()/5)), pct);
+    double leftSpeed = -(Controller1.Axis3.position() - Controller1.Axis1.position() / 2);
+    double rightSpeed = -(Controller1.Axis3.position() + Controller1.Axis1.position() / 2);
+
+    //exponents that work: 2.120, 2.200, 2.280, 2.296, 2.360, 2.600, 2.760, 2.920, 3.00
+    leftFront.spin(fwd, pow(leftSpeed * .01, 2.12) * 100, pct);
+    leftBack.spin(fwd, pow(leftSpeed * .01, 2.12) * 100, pct);
+    leftMiddle.spin(fwd, pow(leftSpeed * .01, 2.12) * 100, pct);
+    rightFront.spin(fwd, pow(rightSpeed * .01, 2.12) * 100, pct);
+    rightBack.spin(fwd, pow(rightSpeed * .01, 2.12) * 100, pct);
+    rightMiddle.spin(fwd, pow(rightSpeed * .01, 2.12) * 100, pct);
   
     if(Controller1.ButtonL2.pressing()){
       intake.spin(forward, 100, pct);
