@@ -27,7 +27,7 @@ digital_out clamp = digital_out(Brain.ThreeWirePort.H);
 motor intake = motor(PORT8, ratio18_1, true);
 inertial aniNertial = inertial(PORT21);
 digital_out deviDoinker = digital_out(Brain.ThreeWirePort.D);
-bumper beep = bumper(Brain.ThreeWirePort.A); //find the correct port for this
+bumper beep = bumper(Brain.ThreeWirePort.A); 
 
 extern bumper beep;
 extern digital_out deviDoinker;
@@ -43,11 +43,10 @@ extern digital_out clamp;
 extern inertial aniNertial;
 extern motor intake;
 
-//aniGle is the global angle! (named after anika obv)
 int aniGle = 0;
 int beepy = 0;
 int intakeToggle = 0;
-bool tessaToggle = false;
+int tessaToggle = 0;
 
 //tune kp for robot (same for right turns!)
 //change minSpeed
@@ -147,7 +146,6 @@ void moveDonuts(int ms, int speed) {
   intake.stop();
 
 }
-//minimum and maximum paramaters for different scenarios
 void moveF(double target, int min, bool donut) { 
   leftFront.resetPosition();
   rightFront.resetPosition();
@@ -187,7 +185,6 @@ void moveF(double target, int min, bool donut) {
 
   wait(200, msec);
 }
-
 void moveR(double target, int min, int max, bool donut){
   leftFront.resetPosition();
   rightFront.resetPosition();
@@ -226,7 +223,6 @@ void moveR(double target, int min, int max, bool donut){
 
   wait(200, msec);
 }
-
 void donut(int ms){
   intake.spin(reverse, 100, pct);
   wait(ms,msec);
@@ -238,33 +234,7 @@ A minimum of two (2) Stakes on the Alliance's side of the Autonomous Line with a
 Neither Robot contacting / breaking the plane of the Starting Line
 At least One (1) Robot contacting the Ladder */
 //do not pass the Autonomous Line
-
-
-//FOR CLAMP: TRUE IS UP, FALSE IS DOWN  
-//dont do this! it is good!
-/*
-void v1Rightrb(){ //starting parallel to the mogo on the right side, move forward and grab the mogo
-  //knock over piles and get the blue rings
-  //touch the ladder
-  //if the other team gets at least one donut on mogo
-  //start with preload
-  //moveF 2 squares
-  clamp.set(true);
-  moveF(500, 10);
-  //clamp set true
-  wait(400, msec);
-  clamp.set(false);
-  wait(400, msec);
-  //left -90 degrees
-  turnL(-90);
-  //moveR 1 square
-  //intake start
-  moveR(300, 10, 80);
-  donut(900);
-  turnR(-40);
-  moveR(800, 5, 30);
-
-}*/
+//https://www.vexrobotics.com/high-stakes-manual?srsltid=AfmBOorzsToCl6EP84RN2FEUXlbi8F7sifry7AFLoduSPw0JQdBVvpiy
 
 void blueRightAutonomous(){
   /*moveF(500, 10, false);
@@ -298,8 +268,6 @@ void blueRightAutonomous(){
   turnR(-80);
   moveF(550, 5, true);
 }
-
-//test this!
 void redRightAutonomous(){
   moveF(500, 10, false);
   //clamp set true
@@ -315,7 +283,6 @@ void redRightAutonomous(){
   turnR(-80);
   moveF(550, 5, true);
 }
-
 void redLeftAutonomous(){
   /*
   moveF(500, 10, false);
@@ -349,7 +316,6 @@ void redLeftAutonomous(){
   turnL(80);
   moveF(550, 5, true);
 }
-
 void blueLeftAutonomous(){
   moveF(500, 10, false);
   //clamp set true
@@ -372,7 +338,6 @@ void blueLeftAutonomous(){
   donut(2700);
   */
 }
-
 void autoSkills(){
   moveF(80, 10, false);
   wait(200, msec);
@@ -431,183 +396,22 @@ void autoSkills(){
   turnL(-135);
   moveR(300, 10, 80, false);
 }
-/*
-void v1Leftrb(){ //half awp
-  //starting parallel to the mogo on the right side, move forward and grab the mogo
-  //knock over piles and get the blue rings
-  //touch the ladder
-  //if the other team gets at least one donut on mogo
-  //start with preload
-  //move 2 squares
-  moveF(900, 10);
-  //right 90
-  turnR(90);
-  //clamp set true
-  clamp.set(true);
-  //reverse 1 square
-  moveR(950, 10, 80);
-  //intake start
-  //turn left 45
-  turnL(50);
-  //moveF 1 square
-  moveF(550, 10);
-}
-
-//redo this! this is bad!
-void v2LeftB(){
-  moveF(2000, 10);
-  clamp.set(true);
-  clamp.set(false);
-  turnR(90);
-  moveF(2000, 10);
-  clamp.set(true);
-  turnR(-90);
-  moveF(400, 10);
-  turnL(180);
-  moveF(350, 10);
-  turnL(-90);
-  moveF(500, 10);
-}
-
-//redo this! it is bad!
-void v2RightR(){
-  moveF(2000, 10);
-  clamp.set(true);
-  clamp.set(false);
-  turnL(-90);
-  moveF(2000, 10);
-  clamp.set(true);
-  turnL(90);
-  moveF(400, 10);
-  turnR(180);
-  moveF(350, 10);
-  turnR(90);
-  moveF(500, 10);
-}
-
-void codingChallenge(){
-  //24 fwd, right 45, 12 rev, left 90
-  moveF(1050, 10);
-  turnL(-45);
-  moveR(700, 10, 80);
-  turnR(45);
-}*/
-/*
-void twofivezeroninea(){
-  //from the finals at highlander summit
-  //blue right
-  moveF(1500, 10);
-  turnR(45);
-  moveF(525, 10);
-  turnR(90);
-  moveR(1500, 10, 80);
-  turnR(180);
-}
-
-void foursixtenc(){
-  //blue left
-  //back up 2 squares
-  moveR(2100, 10);
-  //turn right 45
-  turnR(45);
-  //reverse 1/2 square
-  moveR(500, 10);
-  //forward 2 squares
-  moveF(2100, 10);
-  //reverse a little
-  moveR(100, 10);
-  //180 left
-  turnL(-90);
-  //forward 2 squares
-  moveF(2100, 10);
-  //right 75
-  turnR(-15);
-  //forward to corner
-  moveF(1700, 10);
-  //reverse a little
-  moveR(200, 10);
-  //right 180
-  turnR(165);
-  //forward across the field
-  moveF(5250, 10);
-}
-
-void oneonesixeighta(){
-  //move forward a little bit
-  moveF(200, 10);
-  //right 45 
-  turnR(45);
-  //move back a little bit
-  moveR(200, 10);
-  //forward a little bit
-  moveF(200, 10);
-  // left back to 0
-  turnL(0);
-  //forward 2 squares
-  moveF(2000, 10);
-  //turn to -90
-  turnL(-90);
-  //reverse 2 squares
-  moveR(2000, 10);
-  //turns left to -45
-  turnL(-45);
-  //forward to the bar
-  moveF(2000, 10);
-
-}
-
-void onesixtyninetyninec(){
-  //right 15
-  turnR(15);
-  //reverse 1 square
-  moveR(1000, 10);
-  //left -15
-  turnL(-15);
-  //reverse 1 square
-  moveR(1000, 10);
-  //turn right 90
-  turnR(90);
-  //forward 2 squares
-  moveF(2000, 10);
-  //right 180
-  turnR(180);
-  //forward little
-  moveF(200, 10);
-  //left 125
-  turnL(125);
-  //reverse a little
-  moveR(200, 10);
-  //back to 180
-  turnR(180);
-  //forward little
-  moveF(200, 10);
-  //left 125
-  turnL(125);
-  //reverse all the way back
-  moveR(5000, 10);
-  //a little forward
-  moveF(200, 10);
-  //left 15
-  turnL(15);
-}
-*/
-//slot 1 - redleft
-//slot 2 - redright
-//slot 3 - blueleft
-//slot 4 - blueright
 
 void pre_auton(void) {
   Brain.Screen.clearScreen();
   Brain.Screen.setCursor(1, 1);
   Brain.Screen.print("calibrating inertial...");
   aniNertial.calibrate();
+
   Brain.Screen.clearScreen();
   Brain.Screen.setCursor(1, 1);
   Brain.Screen.print("resetting rotation...");
   aniNertial.resetRotation();
+
   Brain.Screen.clearScreen();
   Brain.Screen.setCursor(1, 1);
   Brain.Screen.print("hold the bumper to select auton!");
+
   while(true){
     if(beep.pressing()){
       beepy++;
@@ -653,19 +457,18 @@ void autonomous(void) {
   }
   */
 }
-
 void drive(){
   while(true) {
-    double leftSpeed = -(Controller1.Axis3.position() - Controller1.Axis1.position() / 2);
-    double rightSpeed = -(Controller1.Axis3.position() + Controller1.Axis1.position() / 2);
+    double leftSpeed = -(Controller1.Axis3.position() - (Controller1.Axis1.position() * .75));
+    double rightSpeed = -(Controller1.Axis3.position() + (Controller1.Axis1.position() * .75));
 
-    //exponents that work: 2.120, 2.200, 2.280, 2.296, 2.360, 2.600, 2.760, 2.920, 3.00
-    leftFront.spin(fwd, pow(leftSpeed * .01, 2.12) * 100, pct);
-    leftBack.spin(fwd, pow(leftSpeed * .01, 2.12) * 100, pct);
-    leftMiddle.spin(fwd, pow(leftSpeed * .01, 2.12) * 100, pct);
-    rightFront.spin(fwd, pow(rightSpeed * .01, 2.12) * 100, pct);
-    rightBack.spin(fwd, pow(rightSpeed * .01, 2.12) * 100, pct);
-    rightMiddle.spin(fwd, pow(rightSpeed * .01, 2.12) * 100, pct);
+    //exponents that work: 2.12, 2.2, 2.28, 2.296, 2.36, 2.6, 2.76, 2.92, 3
+    leftFront.spin(fwd, pow(leftSpeed * .01, 3) * 100, pct);
+    leftBack.spin(fwd, pow(leftSpeed * .01, 3) * 100, pct);
+    leftMiddle.spin(fwd, pow(leftSpeed * .01, 3) * 100, pct);
+    rightFront.spin(fwd, pow(rightSpeed * .01, 3) * 100, pct);
+    rightBack.spin(fwd, pow(rightSpeed * .01, 3) * 100, pct);
+    rightMiddle.spin(fwd, pow(rightSpeed * .01, 3) * 100, pct);
   
     if(Controller1.ButtonL2.pressing()){
       intake.spin(forward, 100, pct);
@@ -686,18 +489,18 @@ void drive(){
     }
 
     if(Controller1.ButtonA.pressing()){
-      tessaToggle = !tessaToggle;
-      if(tessaToggle){
+      if(tessaToggle == 0){
         deviDoinker.set(false);
-      } else {
+        tessaToggle++;
+      } else if(tessaToggle == 1){
         deviDoinker.set(true);
+        tessaToggle--;
       }
     } 
 
     wait(50, msec);
   }
 }
-
 void usercontrol(void) {
   while (1) {
     
@@ -710,7 +513,6 @@ void usercontrol(void) {
     turnL(0);*/
   }
 }
-
 int main() {
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
