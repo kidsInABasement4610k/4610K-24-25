@@ -231,9 +231,27 @@ void moveR(double target, int min, int max, bool donut){
 
   wait(200, msec);
 }
-void donut(int ms){
-  intake.spin(forward, 100, pct);
-  wait(ms,msec);
+void donut(int target){
+  intake.resetPosition();
+  if(allianceColor == Red){
+    while(intake.getPosition() < target){
+      if(opt.hue() > 200 && opt.hue() < 230){
+        intake.spin(reverse, 100, pct);
+        wait(300, msec);
+      } else {
+        intake.spin(forward, 100, pct);
+      }
+    }
+  } else if(allianceColor == Blue){
+    while(intake.getPosition() < target){
+      if(opt.hue() < 25 || opt.hue() > 340){
+        intake.spin(reverse, 100, pct);
+        wait(300, msec);
+      } else {
+        intake.spin(forward, 100, pct);
+      }
+    }
+  }
   intake.stop();
 }
 
