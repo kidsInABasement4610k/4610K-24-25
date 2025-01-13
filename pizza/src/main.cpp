@@ -23,11 +23,14 @@ motor rightMiddle = motor(PORT5, ratio18_1, false);
 motor leftMiddle = motor(PORT11, ratio18_1, true);
 motor rightFront = motor(PORT2, ratio18_1, false);
 motor leftFront = motor(PORT15, ratio18_1, true);
+motor katieRerouter = motor(PORT1, ratio18_1, true);
 digital_out clamp = digital_out(Brain.ThreeWirePort.H);
-motor intake = motor(PORT8, ratio18_1, true);
+motor intake = motor(PORT8, ratio18_1, false);
 inertial aniNertial = inertial(PORT21);
 digital_out deviDoinker = digital_out(Brain.ThreeWirePort.D);
 bumper beep = bumper(Brain.ThreeWirePort.A); 
+//find true port for optical sensor
+optical opt = optical(PORT1);
 
 extern bumper beep;
 extern digital_out deviDoinker;
@@ -42,12 +45,17 @@ extern motor leftMiddle;
 extern digital_out clamp;
 extern inertial aniNertial;
 extern motor intake;
+extern motor katieRerouter;
+extern optical opt;
 
 int aniGle = 0;
 int beepy = 0;
 int intakeToggle = 0;
 int tessaToggle = 0;
-
+color Blue = color(66, 187, 252);
+color Red = color(250, 37, 52);
+color allianceColor;
+color notAllianceColor;
 //tune kp for robot (same for right turns!)
 //change minSpeed
 void turnL(int target){
@@ -60,7 +68,7 @@ void turnL(int target){
     double prevErr = error;
     error = abs(target - aniNertial.rotation(degrees));
     deriviative = error - prevErr;
-    double kp = .3;
+    double kp = .32;
     double minSpeed = 5;
     double speed = error * kp + deriviative * kd + minSpeed;
 
@@ -98,7 +106,7 @@ void turnR(int target){
     double prevErr = error;
     error = target - aniNertial.rotation(degrees);
     deriviative = error - prevErr;
-    double kp = .3;
+    double kp = .32;
     double minSpeed = 5;
     double speed = error * kp + deriviative * kd + minSpeed;
     
@@ -133,7 +141,7 @@ void moveDonuts(int ms, int speed) {
   rightMiddle.spin(reverse, speed, pct);
   leftBack.spin(reverse, speed, pct);
   rightBack.spin(reverse, speed, pct);
-  intake.spin(reverse, 100, pct);
+  intake.spin(forward, 100, pct);
 
   wait(ms, msec);
 
@@ -159,7 +167,7 @@ void moveF(double target, int min, bool donut) {
     double kp = .04;
     deriviative = error - prevErr;
     double speed = error * kp + deriviative * kd + min; 
-    int max = 80;
+    int max = 83;
     if(speed > max){
       speed = max;
     }
@@ -170,7 +178,7 @@ void moveF(double target, int min, bool donut) {
     leftMiddle.spin(fwd, speed, pct);
     rightMiddle.spin(fwd, speed, pct);
     if(donut){
-      intake.spin(reverse, 100, pct);
+      intake.spin(forward, 100, pct);
     }
     wait(10, msec);
   }
@@ -202,7 +210,7 @@ void moveR(double target, int min, int max, bool donut){
       speed = max;
     }
     if(donut){
-      intake.spin(reverse, 100, pct);
+      intake.spin(forward, 100, pct);
     }
     leftFront.spin(fwd, -speed, pct);
     rightFront.spin(fwd, -speed, pct);
@@ -224,7 +232,7 @@ void moveR(double target, int min, int max, bool donut){
   wait(200, msec);
 }
 void donut(int ms){
-  intake.spin(reverse, 100, pct);
+  intake.spin(forward, 100, pct);
   wait(ms,msec);
   intake.stop();
 }
@@ -237,23 +245,8 @@ At least One (1) Robot contacting the Ladder */
 //https://www.vexrobotics.com/high-stakes-manual?srsltid=AfmBOorzsToCl6EP84RN2FEUXlbi8F7sifry7AFLoduSPw0JQdBVvpiy
 
 void blueRightAutonomous(){
-  /*moveF(500, 10, false);
-  //clamp set true
-  wait(200, msec);
-  clamp.set(true);
-  wait(200, msec);
-  //left -90 degrees
-  turnL(-90);
-  //moveR 1 square
-  //intake start
-  moveR(400, 10, 80, true);
-  donut(1500);
-  turnL(-180);
-  moveR(140, 10, 100, true);
-  donut(2500);
-  moveF(200, 5, true);
-  turnR(-75);
-  moveF(1000, 10, false);*/
+  allianceColor = Blue;
+  notAllianceColor = Red;
   moveF(500, 10, false);
   //clamp set true
   wait(200, msec);
@@ -268,7 +261,10 @@ void blueRightAutonomous(){
   turnR(-80);
   moveF(550, 5, true);
 }
-void redRightAutonomous(){
+
+void redRightAutonomousNotSolo(){
+  allianceColor = Red;
+  notAllianceColor = Blue;
   moveF(500, 10, false);
   //clamp set true
   wait(200, msec);
@@ -282,8 +278,38 @@ void redRightAutonomous(){
   donut(2300);
   turnR(-80);
   moveF(550, 5, true);
+}
+
+//doinker false is down
+void redRightAutonomous(){
+  allianceColor = Red;
+  notAllianceColor = Blue;
+  moveF(420, 15, false);
+  //clamp set true
+  wait(100, msec);
+  clamp.set(true);
+  wait(100, msec);
+  //left -90 degrees
+  turnL(-90);
+  //moveR 1 square
+  //intake start
+  moveR(400, 15, 80, true);
+  donut(2300);
+  clamp.set(false);
+  turnR(-20);
+  moveF(170, 15, false);
+  clamp.set(true);
+  wait(100, msec);
+  moveR(600, 15, 90, true);
+  deviDoinker.set(true);
+  wait(100, msec);
+  turnL(-90);
+  deviDoinker.set(false);
+  donut(2000);
 }
 void redLeftAutonomous(){
+  allianceColor = Red;
+  notAllianceColor = Blue;
   /*
   moveF(500, 10, false);
   //clamp set true
@@ -317,6 +343,8 @@ void redLeftAutonomous(){
   moveF(550, 5, true);
 }
 void blueLeftAutonomous(){
+  allianceColor = Blue;
+  notAllianceColor = Red;
   moveF(500, 10, false);
   //clamp set true
   wait(200, msec);
@@ -339,6 +367,8 @@ void blueLeftAutonomous(){
   */
 }
 void autoSkills(){
+  allianceColor = Red;
+  notAllianceColor = Blue;
   moveF(80, 10, false);
   wait(200, msec);
   clamp.set(true);
@@ -436,9 +466,8 @@ void pre_auton(void) {
   }
 }
 void autonomous(void) {
-  autoSkills();
-  /*
-  switch(beepy){
+  redRightAutonomous();
+  /*switch(beepy){
     case 1:
       redLeftAutonomous();
       break;
@@ -454,15 +483,14 @@ void autonomous(void) {
     case 5:
       autoSkills();
       break;
-  }
-  */
+  }*/
 }
 void drive(){
   while(true) {
     double leftSpeed = -(Controller1.Axis3.position() - (Controller1.Axis1.position() * .75));
     double rightSpeed = -(Controller1.Axis3.position() + (Controller1.Axis1.position() * .75));
 
-    //exponents that work: 2.12, 2.2, 2.28, 2.296, 2.36, 2.6, 2.76, 2.92, 3
+    //exponents that *should* work: 2.12, 2.2, 2.28, 2.296, 2.36, 2.6, 2.76, 2.92, 3
     leftFront.spin(fwd, pow(leftSpeed * .01, 3) * 100, pct);
     leftBack.spin(fwd, pow(leftSpeed * .01, 3) * 100, pct);
     leftMiddle.spin(fwd, pow(leftSpeed * .01, 3) * 100, pct);
@@ -470,10 +498,20 @@ void drive(){
     rightBack.spin(fwd, pow(rightSpeed * .01, 3) * 100, pct);
     rightMiddle.spin(fwd, pow(rightSpeed * .01, 3) * 100, pct);
   
+    /*
     if(Controller1.ButtonL2.pressing()){
-      intake.spin(forward, 100, pct);
+      intake.spin(reverse, 100, pct);
     } else if(Controller1.ButtonL1.pressing()){
       intakeToggle++;
+      if(intakeToggle == 1){
+        intake.spin(forward, 100, pct);
+      } else {
+        intake.stop();
+        intakeToggle = 0;
+      }*/
+    
+
+    if(Controller1.ButtonL2.pressing()){
       if(intakeToggle == 1){
         intake.spin(reverse, 100, pct);
       } else {
@@ -481,6 +519,8 @@ void drive(){
         intakeToggle = 0;
       }
     }
+
+    //red = 250, 37, 52, blue = 66, 187, 252
   
     if(Controller1.ButtonR1.pressing()){
       clamp.set(true);
@@ -498,19 +538,18 @@ void drive(){
       }
     } 
 
+    if(Controller1.ButtonX.pressing()){
+      katieRerouter.spin(forward, 100, pct);
+    } else if(Controller1.ButtonY.pressing()){
+      katieRerouter.spin(reverse, 100, pct);
+    }
+
     wait(50, msec);
   }
 }
 void usercontrol(void) {
-  while (1) {
-    
+  while (1) {    
     drive();
-    /*
-    aniNertial.calibrate();
-    wait(3, sec);
-    aniNertial.resetRotation();
-    turnR(90);
-    turnL(0);*/
   }
 }
 int main() {
